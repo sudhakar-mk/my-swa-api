@@ -1,5 +1,5 @@
 // src/functions/status/index.js
-const { getStatus } = require('../..//logic/statusLogic'); // path to your logic if needed
+const { getStatus } = require('../logic/statusLogic'); // path to your logic if needed
 
 module.exports = async function (context, req) {
   context.log('Status function processed a request.');

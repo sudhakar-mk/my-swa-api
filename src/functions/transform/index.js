@@ -1,5 +1,5 @@
 // src/functions/transform/index.js
-const { transformText } = require('../../logic/transformLogic'); // adjust path if needed
+const { transformText } = require('../logic/transformLogic'); // adjust path if needed
 
 module.exports = async function (context, req) {
   context.log('Transform function hit.');
