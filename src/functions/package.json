@@ -1,0 +1,9 @@
+{
+  "name": "swa-managed-api",
+  "version": "1.0.0",
+  "description": "API for Static Web App",
+  "engines": { "node": ">=16" },
+  "dependencies": {
+    "@azure/functions": "^4.0.0"
+  }
+}
