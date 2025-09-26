@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Simple SWA Frontend</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; max-width:720px; margin:40px auto; padding:20px; }
+    h1 { font-size:1.4rem; margin-bottom:8px; }
+    .box { background:#f7f7fb; padding:16px; border-radius:8px; margin-bottom:16px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+    label { display:block; margin-bottom:6px; font-weight:600; }
+    input[type="text"] { width:100%; padding:8px; box-sizing:border-box; margin-bottom:8px; }
+    button { padding:8px 12px; border-radius:6px; border:0; cursor:pointer; background:#0b5fff; color:white; }
+    pre { background:#111; color:#0f0; padding:12px; border-radius:6px; overflow:auto; max-height:200px; }
+  </style>
+</head>
+<body>
+
+  <h1>Simple Frontend — Status & Transform</h1>
+
+  <div class="box">
+    <label>API Status</label>
+    <button id="btnStatus">Check /api/status</button>
+    <div id="statusResult" style="margin-top:12px"></div>
+  </div>
+
+  <div class="box">
+    <label>Transform text (POST /api/transform)</label>
+    <input id="txtInput" type="text" placeholder="Type something (e.g. hello world)" value="hello world" />
+    <button id="btnTransform">Send to /api/transform</button>
+    <div style="margin-top:12px">
+      <strong>Response:</strong>
+      <pre id="transformResult">not called yet</pre>
+    </div>
+  </div>
+
+  <script>
+    // NOTE: When hosted in Static Web Apps, using relative /api/* will proxy to functions.
+    // Locally: if you run func start on port 7071, use full URL 'http://localhost:7071/api/...'
+    const statusBtn = document.getElementById('btnStatus');
+    const statusResult = document.getElementById('statusResult');
+    const transformBtn = document.getElementById('btnTransform');
+    const txtInput = document.getElementById('txtInput');
+    const transformResult = document.getElementById('transformResult');
+
+    // helper to pretty-print JSON
+    function pretty(obj) {
+      try { return JSON.stringify(obj, null, 2); } catch(e){ return String(obj); }
+    }
+
+    // Try relative path first (works when served by SWA). If that fails, fallback to local functions host.
+    function apiUrl(path) {
+      // If page was served from file://, window.location.origin becomes "null" — use local functions host
+      if (!window.location.origin || window.location.origin === 'null') {
+        return 'http://localhost:7071' + path;
+      }
+      // If served via SWA or any web server, relative path will work
+      return path;
+    }
+
+    statusBtn.addEventListener('click', async () => {
+      statusResult.textContent = 'loading...';
+      try {
+        const res = await fetch(apiUrl('/api/status'));
+        const json = await res.json();
+        statusResult.innerHTML = '<pre>' + pretty(json) + '</pre>';
+      } catch (err) {
+        statusResult.textContent = 'Error: ' + err.message;
+      }
+    });
+
+    transformBtn.addEventListener('click', async () => {
+      transformResult.textContent = 'loading...';
+      const text = txtInput.value;
+      try {
+        const res = await fetch(apiUrl('/api/transform'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        const json = await res.json();
+        transformResult.textContent = pretty(json);
+      } catch (err) {
+        transformResult.textContent = 'Error: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
